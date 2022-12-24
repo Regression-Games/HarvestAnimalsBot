@@ -8,7 +8,11 @@ challenge!
 ![Gif of the bot attacking animals](images/final.gif)
 
 Regression Games is an AI gaming competition platform - players compete in games
-like Minecraft for prizes and top spots on the leaderboard.
+like Minecraft for prizes and top spots on the leaderboard. In this turorial,
+players will write an algorithm for a bot to collect resources from animals,
+which are worth points.
+
+![Gif of the bot attacking animals](images/attack_tutorial.png)
 
 # Requirements to get started
 

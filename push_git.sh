@@ -51,11 +51,13 @@ if [ ! -d "$GIT_DIR" ]; then
     git checkout -b main
 fi
 
-read -e -p "Commit message (default if blank): " COMMIT_MESSAGE
+# read -e -p "Commit message (default if blank): " COMMIT_MESSAGE
 
-if [ -z "$COMMIT_MESSAGE" ]; then
-  COMMIT_MESSAGE="Code changes from $(date +%F_%T)"
-fi
+# if [ -z "$COMMIT_MESSAGE" ]; then
+#   COMMIT_MESSAGE="Code changes from $(date +%F_%T)"
+# fi
+
+COMMIT_MESSAGE="Code changes from $(date +%F_%T)"
 
 git add .
 git commit -m "$COMMIT_MESSAGE"
