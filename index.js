@@ -64,7 +64,7 @@ function configureBot(bot, matchInfoEmitter) {
 
     // Have the Bot begin our main loop when it spawns into the game
     bot.on('spawn', async () => {
-        console.log("I have arrived...");
+        console.log("I have arrived... v2");
         const previousDeaths = deaths;
 
         const WANDER_RANGE = 1 // this will grow larger and larger each pass it finds nothing
