@@ -61,4 +61,4 @@ COMMIT_MESSAGE="Code changes from $(date +%F_%T)"
 
 git add .
 git commit -m "$COMMIT_MESSAGE"
-git push -u origin main
+git push -u origin main -f
