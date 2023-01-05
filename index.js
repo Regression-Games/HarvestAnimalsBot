@@ -84,7 +84,7 @@ function configureBot(bot, matchInfoEmitter) {
                 ++wanderCount;
             }
         }
-    }
+    });
 
 
 }

