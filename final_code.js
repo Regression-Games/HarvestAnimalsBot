@@ -15,7 +15,7 @@ function configureBot(bot) {
     const animalsToHunt = ["chicken", "pig", "cow", "sheep"];
 
     async function huntAnimals() {
-        let nearbyAnimals = bot.findEntities({entityNames: animalsToHunt, maxDistance: 100});
+        let nearbyAnimals = bot.findEntities({ entityNames: animalsToHunt, maxDistance: 100 });
         console.log(nearbyAnimals)
         if (nearbyAnimals.length == 0) {
             bot.chat("Could not find animals nearby... going to wander and try again")

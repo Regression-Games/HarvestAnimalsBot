@@ -1,13 +1,11 @@
 const RG = require('rg-bot');
-const { RGMatchInfo } = require('rg-match-info');
 
 /**
  * This bot will find animals and kill them with its bare hands.
  * Any drops from the animals will be collected for points!
  * @param {RG.RGBot} bot
- * @param {EventEmitter} matchInfoEmitter
  */
-function configureBot(bot, matchInfoEmitter) {
+function configureBot(bot) {
 
     bot.setDebug(true);
     bot.allowParkour(true);
@@ -27,11 +25,8 @@ function configureBot(bot, matchInfoEmitter) {
         let animalName = animalToAttack.name
         bot.chat(`Hunting a ${animalName}`)
 
-        attackCount = 0
-        let didAttack = true
-        while (didAttack && animalToAttack.isValid && attackCount < 50) {
-            attackCount++;
-            didAttack = await bot.attackEntity(animalToAttack)
+        while (animalToAttack.isValid) {
+            await bot.attackEntity(animalToAttack)
         }
         bot.chat(`Finished attacking the ${animalName}, moving on the next victim`)
         return true
@@ -39,25 +34,18 @@ function configureBot(bot, matchInfoEmitter) {
 
     async function repeatHuntAnimals() {
         const previousDeaths = deaths;
-
-        // The bot will wander further every time it can't find an animal
-        let wanderMinDistance = 1
-
         const botStillAlive = () => { return previousDeaths === deaths }
         while (botStillAlive()) {
             const didHuntAndKill = await huntAnimal()
             if (didHuntAndKill) {
-                wanderMinDistance = 0
                 let itemsOnGround = await bot.findAndCollectItemsOnGround()
                 bot.chat(`Picked up ${itemsOnGround.length} items off the ground`)
             } else {
                 bot.chat("Could not find animals nearby... going to wander and try again")
-                await bot.wander(wanderMinDistance, wanderMinDistance * 2);
-                wanderMinDistance++;
+                await bot.wander(10, 30);
             }
         }
     }
-
 
     bot.on('death', () => {
         deaths++;
