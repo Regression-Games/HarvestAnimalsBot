@@ -27,7 +27,7 @@ function configureBot(bot, matchInfoEmitter) {
         const ATTACK_LIMIT = 50
         letAttackCount = 0
         let didAttack = true
-        while (didAttack && animalToAttack.isValid && attackCount++ < ATTACK_LIMIT) {
+        while (didAttack && animalToAttack.isValid && letAttackCount++ < ATTACK_LIMIT) {
             didAttack = await bot.attackEntity(animalToAttack)
         }
         bot.chat(`Finished attacking the ${animalName}, moving on the next victim`)
