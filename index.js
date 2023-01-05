@@ -12,7 +12,7 @@ function configureBot(bot) {
 
     // If there are no animals around, have it attack you by adding
     // "player" to this list.
-    const animalsToHunt = ["chicken", "pig", "cow", "sheep", "rabbit"];
+    const animalsToHunt = ["chicken", "pig", "cow", "sheep", "rabbit", "player"];
     let deaths = 0
 
     async function huntAnimal() {
