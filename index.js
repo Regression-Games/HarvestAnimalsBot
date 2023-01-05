@@ -12,7 +12,10 @@ function configureBot(bot, matchInfoEmitter) {
     bot.setDebug(true);
     bot.allowParkour(true);
 
+    // If there are no animals around, have it attack you by adding
+    // "player" to this list.
     const animalsToHunt = ["chicken", "pig", "cow", "sheep", "rabbit"];
+    let deaths = 0
 
     async function huntAnimal() {
         let nearbyAnimals = bot.findEntities({ entityNames: animalsToHunt, maxDistance: 100 });
@@ -24,68 +27,52 @@ function configureBot(bot, matchInfoEmitter) {
         let animalName = animalToAttack.name
         bot.chat(`Hunting a ${animalName}`)
 
-        const ATTACK_LIMIT = 50
-        letAttackCount = 0
+        attackCount = 0
         let didAttack = true
-        while (didAttack && animalToAttack.isValid && letAttackCount++ < ATTACK_LIMIT) {
+        while (didAttack && animalToAttack.isValid && attackCount < 50) {
+            attackCount++;
             didAttack = await bot.attackEntity(animalToAttack)
         }
         bot.chat(`Finished attacking the ${animalName}, moving on the next victim`)
         return true
     }
 
-    // default to true in-case we miss the start
-    let matchInProgress = true;
+    async function repeatHuntAnimals() {
+        const previousDeaths = deaths;
 
-    matchInfoEmitter.on('match_ended', async (matchInfo) => {
-        const points = matchInfo?.players.find(player => player.username === bot.username())?.metadata?.score
-        console.log(`The match has ended - I scored ${points} points`)
-        matchInProgress = false;
-    })
+        // The bot will wander further every time it can't find an animal
+        let wanderMinDistance = 1
 
-    matchInfoEmitter.on('match_started', async (matchInfo) => {
-        console.log(`The match has started`)
-        matchInProgress = true;
-    })
+        const botStillAlive = () => { return previousDeaths === deaths }
+        while (botStillAlive()) {
+            const didHuntAndKill = await huntAnimal()
+            if (didHuntAndKill) {
+                wanderMinDistance = 0
+                let itemsOnGround = await bot.findAndCollectItemsOnGround()
+                bot.chat(`Picked up ${itemsOnGround.length} items off the ground`)
+            } else {
+                bot.chat("Could not find animals nearby... going to wander and try again")
+                await bot.wander(wanderMinDistance, wanderMinDistance * 2);
+                wanderMinDistance++;
+            }
+        }
+    }
 
-    let deaths = 0
 
     bot.on('death', () => {
-        console.log("!*!*!*! I have died...")
-        ++deaths;
+        deaths++;
     })
 
     bot.on('chat', async (username, message) => {
         if (username == bot.username()) return
         if (message == "hunt") {
-            huntAnimals()
+            repeatHuntAnimals()
         }
     })
 
-    // Have the Bot begin our main loop when it spawns into the game
     bot.on('spawn', async () => {
-        console.log("I have arrived... v2");
-        const previousDeaths = deaths;
-
-        const WANDER_RANGE = 1 // this will grow larger and larger each pass it finds nothing
-
-        let wanderCount = 0
-
-        const isActiveFunction = () => { return matchInProgress && previousDeaths === deaths }
-        while (isActiveFunction()) {
-            const hunted = await huntAnimal()
-            if (hunted) {
-                wanderCount = 0
-                let itemsOnGround = await bot.findAndCollectItemsOnGround()
-                bot.chat(`Picked up ${itemsOnGround.length} items off the ground`)
-            } else {
-                bot.chat("Could not find animals nearby... going to wander and try again")
-                await bot.wander(WANDER_RANGE + wanderCount, (WANDER_RANGE + wanderCount) * 2);
-                ++wanderCount;
-            }
-        }
+        console.log("I have arrived... ready to hunt some animals!");
     });
-
 
 }
 

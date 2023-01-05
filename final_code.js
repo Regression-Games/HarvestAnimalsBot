@@ -10,7 +10,9 @@ function configureBot(bot) {
     bot.setDebug(true);
     bot.allowParkour(true);
 
-    const animalsToHunt = ["chicken", "pig", "cow", "sheep", "player"];
+    // If there are no animals around, have it attack you by adding
+    // "player" to this list.
+    const animalsToHunt = ["chicken", "pig", "cow", "sheep"];
 
     async function huntAnimals() {
         let nearbyAnimals = bot.findEntities({entityNames: animalsToHunt, maxDistance: 100});
