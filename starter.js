@@ -10,14 +10,25 @@ function configureBot(bot) {
     bot.setDebug(true);
     bot.allowParkour(true);
 
+    // We keep track of deaths to make sure that this bot stops when it dies
+    let deaths = 0
+
+    // ADD HUNTING LOGIC HERE
+
+    // Record deaths by incrementing our counter every time we die
+    bot.on('death', () => {
+        deaths++;
+    })
+
+    // Only start hunting once we ask the bot to start
     bot.on('chat', async (username, message) => {
         if (username == bot.username()) return
         bot.chat("I'm a big dummy bot and don't know how to do anything! Leave me alone!")
     })
 
-    // Have the Bot begin our main loop when it spawns into the game
+    // On spawn, chat a message
     bot.on('spawn', async () => {
-        bot.chat('Hello, I have arrived!');
+        console.log("I have arrived... ready to hunt some animals!");
     });
 
 }

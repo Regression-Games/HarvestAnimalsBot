@@ -10,11 +10,15 @@ function configureBot(bot) {
     bot.setDebug(true);
     bot.allowParkour(true);
 
+    // We keep track of deaths to make sure that this bot stops when it dies
+    let deaths = 0
+
     // If there are no animals around, have it attack you by adding
     // "player" to this list.
     const animalsToHunt = ["chicken", "pig", "cow", "sheep", "rabbit"];
-    let deaths = 0
 
+    // This function finds animals, attacks them until they are dead, and
+    // then picks up their items.
     async function huntAnimal() {
         let nearbyAnimals = bot.findEntities({ entityNames: animalsToHunt, maxDistance: 100 });
         console.log(`Found nearby animals to hunt: ${nearbyAnimals}`)
@@ -25,6 +29,8 @@ function configureBot(bot) {
         let animalName = animalToAttack.name
         bot.chat(`Hunting a ${animalName}`)
 
+        // Edge case: If we fail to attack many times, or the bot failed to
+        // attack at all, skip this animal
         attackCount = 0
         let didAttack = true
         while (didAttack && animalToAttack.isValid && attackCount < 50) {
@@ -35,17 +41,20 @@ function configureBot(bot) {
         return true
     }
 
+    // This function allows us to repeatedly call the huntAnimals function
+    // until the bot dies
     async function repeatHuntAnimals() {
-        const previousDeaths = deaths;
-
-        // The bot will wander further every time it can't find an animal
+        // Edge case: the bot will wander further every time it can't find an animal
         let wanderMinDistance = 1
 
+        // While the bot has not died again (i.e. the count has not increased),
+        // try to find an animal again.
+        const previousDeaths = deaths;
         const botStillAlive = () => { return previousDeaths === deaths }
         while (botStillAlive()) {
             const didHuntAndKill = await huntAnimal()
             if (didHuntAndKill) {
-                wanderMinDistance = 0
+                wanderMinDistance = 1
                 let itemsOnGround = await bot.findAndCollectItemsOnGround()
                 bot.chat(`Picked up ${itemsOnGround.length} items off the ground`)
             } else {
@@ -56,10 +65,12 @@ function configureBot(bot) {
         }
     }
 
+    // Record deaths by incrementing our counter every time we die
     bot.on('death', () => {
         deaths++;
     })
 
+    // Only start hunting once we ask the bot to start
     bot.on('chat', async (username, message) => {
         if (username == bot.username()) return
         if (message == "hunt") {
@@ -67,6 +78,7 @@ function configureBot(bot) {
         }
     })
 
+    // On spawn, chat a message
     bot.on('spawn', async () => {
         console.log("I have arrived... ready to hunt some animals!");
     });
